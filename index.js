@@ -1,6 +1,7 @@
 const controllers = require("./controllers/controllers");
 const inquirer = require("inquirer");
 
+
 // controllers.searchLibrary({     topic: 'war' })
 
 inquirer
@@ -12,10 +13,11 @@ inquirer
   }
 ])
   .then(inquirerResponse => {
+    let queries = {}
     if (!inquirerResponse.searchQuery) {
       throw new Error('Please Enter A Proper Response')
-    } 
-      controllers.searchLibrary({topic: inquirerResponse.searchQuery})
-    
+    }
+    queries.topic = inquirerResponse.searchQuery
+    controllers.searchLibrary(queries)
 
   })
