@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/abishr12/23andme-challenge#readme",
   "dependencies": {
+    "csv-reorder": "^0.1.1",
     "express": "^4.16.2",
     "inquirer": "^5.1.0",
     "json2csv": "^4.0.1",

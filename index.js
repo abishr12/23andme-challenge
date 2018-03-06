@@ -20,4 +20,6 @@ inquirer
     queries.topic = inquirerResponse.searchQuery
     controllers.searchLibrary(queries)
 
+  }).then(() =>{
+    controllers.reorderCSV()
   })
