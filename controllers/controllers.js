@@ -7,7 +7,10 @@ const newLine = "\r\n";
 // fs.createWriteStream(outputPath, {encoding: 'utf8'});
 
 const fields = [
-  'id',
+  {
+    label: 'Identification',
+    value: 'id'
+  },
   'etag',
   'selfLink',
   'volumeInfo.title',
@@ -15,7 +18,6 @@ const fields = [
   'volumeInfo.publisher',
   'volumeInfo.publishedDate'
 ];
-const json2csvParser = new Json2csvParser({fields});
 
 module.exports = {
   searchLibrary: (parameters) => {
@@ -34,33 +36,30 @@ module.exports = {
       console.log('error:', error); // Print the error if one occurred
       console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
       console.log("*".repeat(100));
-      console.log(body)
+      let books = body.items
 
-      const csv = json2csvParser.parse(body.items) + newLine;
-      console.log("*".repeat(100)); 
+      console.log("*".repeat(100));
       // console.log(csv);
 
-      fs.stat('file.csv', function(err,stat){
-        if(err == null){
+      fs.stat('file.csv', function (err, stat) {
+        if (err == null) {
           console.log('File exists')
-fs
-  .appendFile('file.csv', csv, function (err) {
-    if (err) 
-      throw err;
-    console.log('The "data to append" was appended to file!');
-  });
-        }
-        else{
+          const json2csvParser = new Json2csvParser({fields, header: false});
+          const csv = json2csvParser.parse(books) + newLine;
+
+          fs.appendFile('file.csv', csv, function (err) {
+            if (err) 
+              throw err;
+            console.log('The "data to append" was appended to file!');
+          });
+        } else {
           console.log('File Does Not Exist')
         }
       })
-      
 
-          
-      }).catch(err => {
-        throw new Error('Something Went Wrong')
-      })
+    }).catch(err => {
+      throw new Error('Something Went Wrong')
+    })
 
-    }
   }
-
+}
