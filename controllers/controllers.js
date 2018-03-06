@@ -1,8 +1,10 @@
+const fs = require('fs');
 const rp = require("request-promise");
 const Json2csvParser = require('json2csv').Parser;
+const newLine = "\r\n";
 
-// const outputPath = './output.csv'
-// const output = fs.createWriteStream(outputPath, {encoding: 'utf8'});
+// const outputPath = './output.csv' const output =
+// fs.createWriteStream(outputPath, {encoding: 'utf8'});
 
 const fields = [
   'id',
@@ -13,6 +15,7 @@ const fields = [
   'volumeInfo.publisher',
   'volumeInfo.publishedDate'
 ];
+const json2csvParser = new Json2csvParser({fields});
 
 module.exports = {
   searchLibrary: (parameters) => {
@@ -32,13 +35,32 @@ module.exports = {
       console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
       console.log("*".repeat(100));
       console.log(body)
-      const json2csvParser = new Json2csvParser({fields});
-      const csv = json2csvParser.parse(body.items);
-      console.log("*".repeat(100));
-      console.log(csv);
-    }).catch(err => {
-      throw new Error('Something Went Wrong')
-    })
 
+      const csv = json2csvParser.parse(body.items) + newLine;
+      console.log("*".repeat(100)); 
+      // console.log(csv);
+
+      fs.stat('file.csv', function(err,stat){
+        if(err == null){
+          console.log('File exists')
+fs
+  .appendFile('file.csv', csv, function (err) {
+    if (err) 
+      throw err;
+    console.log('The "data to append" was appended to file!');
+  });
+        }
+        else{
+          console.log('File Does Not Exist')
+        }
+      })
+      
+
+          
+      }).catch(err => {
+        throw new Error('Something Went Wrong')
+      })
+
+    }
   }
-}
+
