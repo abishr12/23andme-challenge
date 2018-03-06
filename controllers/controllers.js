@@ -47,25 +47,16 @@ module.exports = {
     const info = {
       uri: 'https://www.googleapis.com/books/v1/volumes?',
       qs: {
-        q: `${parameters.topic}+ 
-        inauthor:${parameters.inAuthor || ''}+
-        inpublisher : ${parameters.inPublisher || ''}      
-        `
+        q: `${parameters.topic}+inauthor:${parameters.inAuthor || ''}`
       },
       json: true
     }
-
-    if (parameters.maxResults) {
-      info.qs.maxResults = parameters.maxResults
+    
+    for(let key in parameters){
+      if(key != 'q'){
+        info.qs[key] = parameters[key]
+      }
     }
-
-    if (parameters.startIndex) {
-      info.qs.startIndex = parameters.startIndex
-    }
-
-if (parameters.orderBy) {
-  info.qs.orderBy = parameters.orderBy
-}
 
     rp(info, function (error, response, body) {
 
@@ -76,6 +67,7 @@ if (parameters.orderBy) {
       let books = body.items
 
       console.log("*".repeat(100));
+      console.log(books)
 
       fs.stat('library.csv', function (err, stat) {
 

@@ -8,16 +8,18 @@ inquirer
   .prompt([
   {
     type: "input",
-    message: "What books would you like to search for? ",
+    message: "Welcome to the Google Books API. \n What books would you like to search for today? ",
     name: "searchQuery"
   }
 ])
   .then(inquirerResponse => {
-    let queries = {}
+    let queries = {
+      maxResults: 3
+    }
     if (!inquirerResponse.searchQuery) {
       throw new Error('Please Enter A Proper Response')
     }
-    queries.topic = inquirerResponse.searchQuery
+    queries.q= inquirerResponse.searchQuery
     controllers.searchLibrary(queries)
 
   }).then(() =>{
