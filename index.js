@@ -1,12 +1,20 @@
 const controllers = require("./controllers/controllers");
 const inquirer = require("inquirer");
-
 const Joi = require('joi');
 
-// controllers.searchLibrary({     topic: 'war' })
+
+/**
+ * @param  {} query
+ * @summary Ensure Query is never blank
+ */
 function validateQuery(query) {
   return query !== "";
 }
+
+/**
+ * @param  {} num
+ * @summary Confirm that integer has been entered 
+ */
 function validateNum(num) {
   var valid;
   Joi.validate(num, Joi.number().required().min(0).max(40), function (err, val) {
@@ -21,6 +29,10 @@ function validateNum(num) {
   });
   return valid
 }
+
+/** 
+ * @summary Questions to determine search parameters
+*/
 const searchQuestions = [
   {
     type: "input",
@@ -61,6 +73,9 @@ const searchQuestions = [
   }
 ]
 
+/**
+ * @summary Questions to determine csv ordering parameters
+*/
 const sortQuestions = [
   {
     type: 'list',
@@ -85,20 +100,31 @@ const sortQuestions = [
   }
 ]
 
+
+
+
+
+/**
+ * @param  {} searchQuestions
+ */
 inquirer
   .prompt(searchQuestions)
   .then(answers => {
     console.log(answers)
 
-    answers['maxResults'] = parseInt(answers['maxResults'])
-
+    /**
+     * @summary Parse relevant answers into integers
+     */
+    answers['maxResults'] = parseInt(answers['maxResults']) 
     answers['startIndex'] = parseInt(answers['startIndex'])
 
-    // console.log(answers)
 
     controllers.searchLibrary(answers)
   })
   .then(() => {
+    /**
+     * @param  {} sortQuestions
+     */
     inquirer
       .prompt(sortQuestions)
       .then(answers => {
@@ -111,4 +137,3 @@ inquirer
       })
 
   })
-

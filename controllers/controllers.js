@@ -1,13 +1,14 @@
 const fs = require('fs');
 const rp = require("request-promise");
 const Json2csvParser = require('json2csv').Parser;
-const newLine = "\r\n";
 const reorder = require('csv-reorder');
 
-// const outputPath = './output.csv' const output =
-// fs.createWriteStream(outputPath, {encoding: 'utf8'});
+const newLine = "\r\n"; // New line when appending rows to CSV
 
-const fields = [
+/** 
+ * @summary Column Headers
+*/
+const columnHeaders = [
   {
     label: 'Identification',
     value: 'id'
@@ -42,55 +43,79 @@ const fields = [
 ];
 
 module.exports = {
-  searchLibrary: (parameters) => {
+  /**
+   * @requires module:fs
+   * @requires module:request-promise
+   * @requires module:json2csv
+   * @param  {} searchParameters
+   *
+   */
+  searchLibrary: (searchParameters) => {
 
-    const info = {
+    /**
+     * @summary Enters search parameters as well as URL
+     */
+    const bookRequest = {
       uri: 'https://www.googleapis.com/books/v1/volumes?',
       qs: {
-        q: `${parameters.q}`
+        q: `${searchParameters.q}`
       },
       json: true
     }
-
-    for (let key in parameters) {
+    /**
+     * @summary Pushes extra search parameters to bookRequest
+     */
+    for (let key in searchParameters) {
       if (key != 'q') {
-        info.qs[key] = parameters[key]
+        bookRequest.qs[key] = searchParameters[key]
       }
     }
-    console.log(info)
+    console.log(bookRequest)
+    /**
+     * @param  {} bookRequest
+     * @summary GET request to Google Books API
+     */
+    rp(bookRequest, function (error, response, body) {
 
-    rp(info, function (error, response, body) {
+      console.log('error:', error); // Print the error if one occurred
+      console.log('statusCode:', response && response.statusCode); // Print theresponse status code if a response was received
 
-      // console.log('error:', error); // Print the error if one occurred
-      // console.log('statusCode:', response && response.statusCode); // Print the
-      // response status code if a response was received console.log("*".repeat(100));
+      let books = body.items //Results from Google Books API
 
-      let books = body.items
-
-      // console.log("*".repeat(100)); console.log(books)
-
+      /**
+         * @param  {} library.csv
+         * @summary Check status of library.csv (existing/non-existent)
+         */
       fs.stat('library.csv', function (err, stat) {
 
+        /**
+         * @param  {} err
+         * @summary Confirm library.csv exists
+         */
         if (err == null) {
-          // console.log('File exists')
-          const json2csvParser = new Json2csvParser({fields, header: false});
+
+          const json2csvParser = new Json2csvParser({columnHeaders, header: false});
           const csv = json2csvParser.parse(books) + newLine;
 
+        /**
+         * @param {} library.csv
+         * @summary Append rows to existing library.csv file
+         */
           fs.appendFile('library.csv', csv, function (err) {
             if (err) 
               throw err;
-              //console.log('The "data to append" was appended to file!');
+              console.log('The "data to append" was appended to file!');
             }
           );
 
         } else if (err.code == 'ENOENT') {
-          //console.log('Creating new file...')
-          const json2csvParser = new Json2csvParser({fields, header: true});
+          console.log('Creating new file...')
+          const json2csvParser = new Json2csvParser({columnHeaders, header: true});
           const csv = json2csvParser.parse(books) + newLine;
           fs.writeFile('library.csv', csv, function (err) {
             if (err) 
               throw err;
-              //console.log('file saved');
+
             }
           );
 
@@ -107,7 +132,11 @@ module.exports = {
     })
 
   },
-
+  /**
+   * @requires module:csv-reorder
+   * @param  {} answers
+   * @summary Reorders library.csv by column (ascending or descending)
+   */
   reorderCSV: (answers) => {
     reorder({
       input: './library.csv',
