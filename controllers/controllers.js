@@ -47,50 +47,52 @@ module.exports = {
     const info = {
       uri: 'https://www.googleapis.com/books/v1/volumes?',
       qs: {
-        q: `${parameters.topic}+inauthor:${parameters.inAuthor || ''}`
+        q: `${parameters.q}`
       },
       json: true
     }
-    
-    for(let key in parameters){
-      if(key != 'q'){
+
+    for (let key in parameters) {
+      if (key != 'q') {
         info.qs[key] = parameters[key]
       }
     }
+    console.log(info)
 
     rp(info, function (error, response, body) {
 
-      console.log('error:', error); // Print the error if one occurred
-      console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-      console.log("*".repeat(100));
+      // console.log('error:', error); // Print the error if one occurred
+      // console.log('statusCode:', response && response.statusCode); // Print the
+      // response status code if a response was received console.log("*".repeat(100));
 
       let books = body.items
 
-      console.log("*".repeat(100));
-      console.log(books)
+      // console.log("*".repeat(100)); console.log(books)
 
       fs.stat('library.csv', function (err, stat) {
 
         if (err == null) {
-          console.log('File exists')
+          // console.log('File exists')
           const json2csvParser = new Json2csvParser({fields, header: false});
           const csv = json2csvParser.parse(books) + newLine;
 
           fs.appendFile('library.csv', csv, function (err) {
             if (err) 
               throw err;
-            console.log('The "data to append" was appended to file!');
-          });
+              //console.log('The "data to append" was appended to file!');
+            }
+          );
 
         } else if (err.code == 'ENOENT') {
-          console.log('Creating new file...')
+          //console.log('Creating new file...')
           const json2csvParser = new Json2csvParser({fields, header: true});
           const csv = json2csvParser.parse(books) + newLine;
           fs.writeFile('library.csv', csv, function (err) {
             if (err) 
               throw err;
-            console.log('file saved');
-          });
+              //console.log('file saved');
+            }
+          );
 
         } else {
           console.log('Error Has Occurred: ', err.code);
@@ -106,15 +108,17 @@ module.exports = {
 
   },
 
-  reorderCSV: () => {
+  reorderCSV: (answers) => {
     reorder({
       input: './library.csv',
       output: './library.csv',
-      sort: 'Page Count',
+      sort: answers.categorySort,
       type: 'number',
-      descending: true,
+      descending: answers.Descending,
       remove: true,
       metadata: false
     })
+
+    console.log('A file called library.csv has been created in your root directory')
   }
 }

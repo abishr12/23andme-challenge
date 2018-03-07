@@ -1,62 +1,114 @@
 const controllers = require("./controllers/controllers");
 const inquirer = require("inquirer");
-let queries = {
-  maxResults: 3
+
+const Joi = require('joi');
+
+// controllers.searchLibrary({     topic: 'war' })
+function validateQuery(query) {
+  return query !== "";
 }
+function validateNum(num) {
+  var valid;
+  Joi.validate(num, Joi.number().required().min(0).max(40), function (err, val) {
+    if (err) {
+      // console.log(err.message);
+      valid = err.message;
+    } else {
+      valid = true;
 
-// controllers.searchLibrary({ topic: 'war' })
+    }
 
-inquirer
-  .prompt([
+  });
+  return valid
+}
+const searchQuestions = [
   {
     type: "input",
-    message: "Welcome to the Google Books API. What books would you like to search for today? ",
-    name: "searchQuery"
+
+    message: "Welcome to the Google Books API. \n What books would you like to search for toda" +
+        "y? ",
+    name: "q",
+    validate: validateQuery
+  }, {
+    type: "input",
+    message: "Would you like to start at certain index? -- press enter key to skip",
+    name: "startIndex",
+    default: '0',
+    validate: validateNum
+
+  }, {
+    type: "input",
+    message: "How many results would you like to retrieve? (max 40)",
+    name: "maxResults",
+    default: '10',
+    validate: validateNum
+  }, {
+    type: "list",
+    message: "Ordered by?",
+    choices: [
+      'relevance', 'newest'
+    ],
+    name: "orderBy",
+    default: 'relevance'
+  }, {
+    type: "list",
+    message: "What kind of print are you looking for?",
+    choices: [
+      'all', 'books', 'magazines'
+    ],
+    name: "printType",
+    default: 'all'
   }
-])
-  .then(inquirerResponse => {
+]
 
-    if (!inquirerResponse.searchQuery) {
-      throw new Error('Please Enter A Proper Response')
-    }
-    queries.q = inquirerResponse.searchQuery
-    //controllers.searchLibrary(queries)
+const sortQuestions = [
+  {
+    type: 'list',
+    message: 'How would you like your csv sorted?',
+    choices: [
+      'Title',
+      'Author(s)',
+      'Publisher',
+      'Published Date',
+      'Page Count',
+      'Average Rating',
+      'Ratings Count'
+    ],
+    name: 'categorySort'
+  }, {
+    type: 'list',
+    message: 'Ascending or Descending?',
+    choices: [
+      'Descending', 'Ascending'
+    ],
+    name: 'descending'
+  }
+]
 
+inquirer
+  .prompt(searchQuestions)
+  .then(answers => {
+    console.log(answers)
+
+    answers['maxResults'] = parseInt(answers['maxResults'])
+
+    answers['startIndex'] = parseInt(answers['startIndex'])
+
+    // console.log(answers)
+
+    controllers.searchLibrary(answers)
   })
   .then(() => {
-    optionsMenu(queries)
-  }).then(() =>{
-    console.log('program has reached its end')
+    inquirer
+      .prompt(sortQuestions)
+      .then(answers => {
+        if (answers['descending'] == 'Descending') {
+          answers['descending'] = true
+        } else {
+          answers['descending'] = false
+        }
+        controllers.reorderCSV(answers)
+      })
+
   })
 
-function optionsMenu(listObj) {
-  inquirer.prompt([
-    {
-      type: "list",
-      message: "Would you like to add any parameters",
-      choices: [
-        'None', 'Maximize Results'
-      ],
-      name: "parameterChoice"
-    }
-  ]).then(res => {
-    if (res.parameterChoice == 'Maximize Results') {
-      maxResults(listObj)
-    }
-  })
-}
-
-function maxResults(listObj) {
-  inquirer
-    .prompt([
-    {
-      type: "input",
-      message: "What is the number of results you would like? max 40",
-      name: "maxResults"
-    }
-  ])
-    .then(res => {
-      listObj['maxResults'] = res.maxResults
-      console.log(listObj)
-    })
-}
