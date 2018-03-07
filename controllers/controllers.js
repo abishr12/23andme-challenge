@@ -6,9 +6,9 @@ const reorder = require('csv-reorder');
 const newLine = "\r\n"; // New line when appending rows to CSV
 
 /** 
- * @summary Column Headers
+ * @summary Column Headers (fields is a reserved keyword)
 */
-const columnHeaders = [
+const fields = [
   {
     label: 'Identification',
     value: 'id'
@@ -81,7 +81,7 @@ module.exports = {
       console.log('statusCode:', response && response.statusCode); // Print theresponse status code if a response was received
 
       let books = body.items //Results from Google Books API
-
+      console.log(books)
       /**
          * @param  {} library.csv
          * @summary Check status of library.csv (existing/non-existent)
@@ -94,7 +94,7 @@ module.exports = {
          */
         if (err == null) {
 
-          const json2csvParser = new Json2csvParser({columnHeaders, header: false});
+          const json2csvParser = new Json2csvParser({fields, header: false});
           const csv = json2csvParser.parse(books) + newLine;
 
         /**
@@ -110,7 +110,7 @@ module.exports = {
 
         } else if (err.code == 'ENOENT') {
           console.log('Creating new file...')
-          const json2csvParser = new Json2csvParser({columnHeaders, header: true});
+          const json2csvParser = new Json2csvParser({fields, header: true});
           const csv = json2csvParser.parse(books) + newLine;
           fs.writeFile('library.csv', csv, function (err) {
             if (err) 
