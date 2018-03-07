@@ -5,21 +5,20 @@ const questions = require('./questions/questions');
 const searchQuestions = questions.searchQuestions
 const sortQuestions = questions.sortQuestions
 
-
+const searchForBooks = () =>{
 /**
  * @param  {} searchQuestions
  */
 inquirer
   .prompt(searchQuestions)
   .then(answers => {
-    console.log(answers)
+    
 
     /**
      * @summary Parse relevant answers into integers
      */
-    answers['maxResults'] = parseInt(answers['maxResults']) 
-    answers['startIndex'] = parseInt(answers['startIndex'])
-
+    answers.maxResults = parseInt(answers.maxResults)
+    answers.startIndex = parseInt(answers.startIndex)
 
     controllers.searchLibrary(answers)
   })
@@ -30,14 +29,21 @@ inquirer
     inquirer
       .prompt(sortQuestions)
       .then(answers => {
-        if (answers['descending'] == 'Descending') {
-          answers['descending'] = true
+       
+        if (answers.descending == 'Descending') {
+          answers.descending = true
         } else {
-          answers['descending'] = false
+          answers.descending = false
         }
         controllers.reorderCSV(answers)
       })
 
   })
 
-  module.exports = {}
+
+
+}
+
+searchForBooks()
+
+module.exports = {searchForBooks}

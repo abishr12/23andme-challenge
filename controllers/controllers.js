@@ -5,7 +5,7 @@ const reorder = require('csv-reorder');
 
 const newLine = "\r\n"; // New line when appending rows to CSV
 
-/** 
+/**
  * @summary Column Headers (fields is a reserved keyword)
 */
 const fields = [
@@ -67,42 +67,46 @@ module.exports = {
      */
     for (let key in searchParameters) {
       if (key != 'q') {
-        bookRequest.qs[key] = searchParameters[key]
+        bookRequest.qs.key = searchParameters.key
       }
     }
-    
+
     /**
      * @param  {} bookRequest
      * @summary GET request to Google Books API
      */
     rp(bookRequest, function (error, response, body) {
 
-      console.log('error:', error); // Print the error if one occurred
-      console.log('statusCode:', response && response.statusCode); // Print theresponse status code if a response was received
+      if (error) {
+        throw error // Print the error if one occurred
+      }
+
+      console.log('\nstatusCode:', response && response.statusCode); // Print theresponse status code if a response was received
 
       let books = body.items //Results from Google Books API
-      console.log(books)
+
+      if(!books){
+        throw Error('No Results Have Been Returned, check your search query')
+      }
+
       /**
-       
          * @summary Check status of library.csv (existing/non-existent)
          */
       fs.stat('library.csv', function (err, stat) {
 
-        
         if (err == null) {
 
           const json2csvParser = new Json2csvParser({fields, header: false});
           const csv = json2csvParser.parse(books) + newLine;
 
-        /**
+          /**
          * @summary Append rows to existing library.csv file
          */
           fs.appendFile('library.csv', csv, function (err) {
             if (err) 
               throw err;
-              console.log('The "data to append" was appended to file!');
-            }
-          );
+            console.log('The "data to append" was appended to file!');
+          });
 
         } else if (err.code == 'ENOENT') {
           console.log('Creating new file...')
@@ -139,7 +143,7 @@ module.exports = {
       output: './library.csv',
       sort: answers.categorySort,
       type: 'number',
-      descending: answers.Descending,
+      descending: answers.descending,
       remove: true,
       metadata: false
     })
@@ -147,4 +151,3 @@ module.exports = {
     console.log('A file called library.csv has been created in your root directory')
   }
 }
-

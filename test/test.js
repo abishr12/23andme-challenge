@@ -1,9 +1,19 @@
-var assert = require('assert');
+const assert = require('assert');
+const controllers = require("../controllers/controllers");
 
-describe('Array', function () {
-    describe('#indexOf()', function () {
-        it('should return -1 when the value is not present', function () {
-            assert.equal([1, 2, 3].indexOf(4), -1);
+
+const testSearch = {
+    uri: 'https://www.googleapis.com/books/v1/volumes?',
+    qs: {
+        q: `batman`
+    },
+    json: true
+}
+
+describe('controllers', function () {
+    describe('searching the Google Books API', function () {
+        it('correct query should not throw error', function () {
+            assert.throws(controllers.searchLibrary(testSearch), Error)
         });
     });
 });
