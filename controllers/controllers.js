@@ -70,7 +70,7 @@ module.exports = {
         bookRequest.qs[key] = searchParameters[key]
       }
     }
-    console.log(bookRequest)
+    
     /**
      * @param  {} bookRequest
      * @summary GET request to Google Books API
@@ -83,22 +83,18 @@ module.exports = {
       let books = body.items //Results from Google Books API
       console.log(books)
       /**
-         * @param  {} library.csv
+       
          * @summary Check status of library.csv (existing/non-existent)
          */
       fs.stat('library.csv', function (err, stat) {
 
-        /**
-         * @param  {} err
-         * @summary Confirm library.csv exists
-         */
+        
         if (err == null) {
 
           const json2csvParser = new Json2csvParser({fields, header: false});
           const csv = json2csvParser.parse(books) + newLine;
 
         /**
-         * @param {} library.csv
          * @summary Append rows to existing library.csv file
          */
           fs.appendFile('library.csv', csv, function (err) {
@@ -151,3 +147,4 @@ module.exports = {
     console.log('A file called library.csv has been created in your root directory')
   }
 }
+
