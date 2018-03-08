@@ -1,7 +1,9 @@
 const assert = require('assert');
 const controllers = require("../controllers/controllers");
 var chai = require('chai'),
-  chaiHttp = require('chai-http');
+  chaiHttp = require('chai-http'),
+  chaiParam = require('chai-param'),
+  param = chaiParam.param;
 var expect = require("chai").expect;
 
 chai.use(chaiHttp);
@@ -48,11 +50,21 @@ describe('Search Library', function () {
       .throw(Error);
   });
 
-it("Throw Error If Incomplete Data Is Passed", function () {
+  it("Throw Error If Empty Data Is Passed", function () {
     expect(function () {
-        controllers.searchLibrary({})
+      controllers.searchLibrary({})
     })
-        .to
-        .throw(Error);
-});
+      .to
+      .throw(Error);
+  });
+
+  it("Return No Errors From Running A Result", function () {
+    expect(function () {
+      controllers.searchLibrary({q: 'batman', maxResults: 10})
+    })
+      .to
+      .not
+      .throw(Error);
+  });
+
 })

@@ -44,6 +44,8 @@ inquirer
 
 }
 
-searchForBooks()
+//searchForBooks()
 
 module.exports = {searchForBooks}
+
+controllers.searchLibrary({q: 'bjakdsfk;adsf'})

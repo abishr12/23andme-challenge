@@ -55,6 +55,11 @@ module.exports = {
     /**
      * @summary Enters search parameters as well as URL
      */
+
+     if(!searchParameters.q){
+       throw new Error('Missing Search Parameters')
+     }
+
     const bookRequest = {
       uri: 'https://www.googleapis.com/books/v1/volumes?',
       qs: {
@@ -85,9 +90,7 @@ module.exports = {
 
       let books = body.items //Results from Google Books API
 
-      if(!books){
-        throw Error('No Results Have Been Returned, check your search query')
-      }
+     
 
       /**
          * @summary Check status of library.csv (existing/non-existent)
