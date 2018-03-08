@@ -1,26 +1,12 @@
 const assert = require('assert');
 const controllers = require("../controllers/controllers");
 var chai = require('chai'),
-  chaiHttp = require('chai-http');
+  chaiHttp = require('chai-http'),
+  chaiParam = require('chai-param'),
+  param = chaiParam.param;
 var expect = require("chai").expect;
 
 chai.use(chaiHttp);
-const testSearch = {
-    blah: 'ajdfkla;dfjksal;f'
-}
-
-const fn = () => {
-  controllers.searchLibrary(testSearch)
-}
-
-// describe('controllers', function () {   describe('searching the Google Books
-// API', function () {     it('correct query should not throw error', function
-// () {       assert.doesNotThrow(fn, Error)     });   }); });
-// describe('controllers', function () {   describe('pinging Google Books API
-// with GET', function () {     it('Route Works', function () {       chai
-// .request('https://www.googleapis.com/books')         .get('/v1/volumes?')
-// .end(function (err, res) {           expect(err).to.be.null; expect(res)
-//        .to             .have             .status(200);   });     })   }) })
 
 var multiply = function (x, y) {
   if (typeof x !== "number" || typeof y !== "number") {
@@ -36,12 +22,49 @@ describe("Multiply", function () {
       .to
       .equal(8);
   });
+});
 
-  it("search library should throw an error", function () {
+describe('Proper Connection To Google API', function () {
+  it('should connect to API with status 200', function (done) {
+    chai
+      .request('https://www.googleapis.com/books')
+      .get('/v1/volumes?q=search+terms')
+      .end(function (err, res) {
+        expect(err).to.be.null;
+        expect(res)
+          .to
+          .have
+          .status(200);
+        done();
+      });
+
+  })
+})
+
+describe('Search Library', function () {
+  it("Throw Error If No Data Is Passed", function () {
     expect(function () {
-      controllers.searchLibrary(testSearch)
+      controllers.searchLibrary()
     })
       .to
       .throw(Error);
   });
-});
+
+  it("Throw Error If Empty Data Is Passed", function () {
+    expect(function () {
+      controllers.searchLibrary({})
+    })
+      .to
+      .throw(Error);
+  });
+
+  it("Return No Errors From Running A Result", function () {
+    expect(function () {
+      controllers.searchLibrary({q: 'batman', maxResults: 10})
+    })
+      .to
+      .not
+      .throw(Error);
+  });
+
+})
