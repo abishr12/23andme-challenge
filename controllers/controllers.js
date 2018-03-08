@@ -43,6 +43,7 @@ const fields = [
 ];
 
 module.exports = {
+
   /**
    * @requires module:fs
    * @requires module:request-promise
@@ -57,11 +58,10 @@ module.exports = {
      * @summary Enters search parameters as well as URL
      */
 
-     if(!searchParameters.q){
-       throw new Error('Missing Search Parameters')
-     }
+    if (!searchParameters.q) {
+      throw new Error('Missing Search Parameters')
+    }
 
-    
     const bookRequest = {
       uri: 'https://www.googleapis.com/books/v1/volumes?',
       qs: {
@@ -69,8 +69,9 @@ module.exports = {
       },
       json: true
     }
-    
-    // If the user enters additional 
+
+    // If the user enters additional search parameters ex. (maximum results, search
+    // index, etc.) include them with request
     for (let key in searchParameters) {
       if (key != 'q') {
         bookRequest.qs.key = searchParameters.key
@@ -84,14 +85,12 @@ module.exports = {
     rp(bookRequest, function (error, response, body) {
 
       if (error) {
-        throw error // Throw error if one occurred during search 
+        throw error // Throw error if one occurred during search
       }
 
       console.log('\nstatusCode:', response && response.statusCode); // Print theresponse status code if a response was received
 
       let books = body.items //Results from Google Books API
-
-     
 
       /**
          * @summary Check status of library.csv (existing/non-existent)
@@ -112,7 +111,7 @@ module.exports = {
 
         } else if (err.code == 'ENOENT') {
 
-          // Create new file (library.csv) with search results 
+          // Create new file (library.csv) with search results
           console.log('Creating new file...')
           const json2csvParser = new Json2csvParser({fields, header: true});
           const csv = json2csvParser.parse(books) + newLine;
@@ -153,5 +152,25 @@ module.exports = {
     })
 
     console.log('A file called library.csv has been created in your root directory')
+  },
+
+  /**
+ * @requires module:fs
+ * @summary Removes library.csv to create new one
+ */
+  removeLibrary: () => {
+    fs
+      .stat('./library.csv', function (err, stats) {
+        if (err) {
+          throw err
+        }
+
+        fs
+          .unlink('./library.csv', function (err) {
+            if (err) 
+              throw err
+            console.log('file deleted successfully');
+          });
+      });
   }
 }
