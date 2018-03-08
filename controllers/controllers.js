@@ -48,7 +48,8 @@ module.exports = {
    * @requires module:request-promise
    * @requires module:json2csv
    * @param  {} searchParameters
-   *
+   * @summary This function hooks into the Google Books API to search
+   * for books and output the library.csv file
    */
   searchLibrary: (searchParameters) => {
 
@@ -60,6 +61,7 @@ module.exports = {
        throw new Error('Missing Search Parameters')
      }
 
+    
     const bookRequest = {
       uri: 'https://www.googleapis.com/books/v1/volumes?',
       qs: {
@@ -67,9 +69,8 @@ module.exports = {
       },
       json: true
     }
-    /**
-     * @summary Pushes extra search parameters to bookRequest
-     */
+    
+    // If the user enters additional 
     for (let key in searchParameters) {
       if (key != 'q') {
         bookRequest.qs.key = searchParameters.key
@@ -83,7 +84,7 @@ module.exports = {
     rp(bookRequest, function (error, response, body) {
 
       if (error) {
-        throw error // Print the error if one occurred
+        throw error // Throw error if one occurred during search 
       }
 
       console.log('\nstatusCode:', response && response.statusCode); // Print theresponse status code if a response was received
@@ -102,9 +103,7 @@ module.exports = {
           const json2csvParser = new Json2csvParser({fields, header: false});
           const csv = json2csvParser.parse(books) + newLine;
 
-          /**
-         * @summary Append rows to existing library.csv file
-         */
+          // Append search results to existing library.csv file
           fs.appendFile('library.csv', csv, function (err) {
             if (err) 
               throw err;
@@ -112,6 +111,8 @@ module.exports = {
           });
 
         } else if (err.code == 'ENOENT') {
+
+          // Create new file (library.csv) with search results 
           console.log('Creating new file...')
           const json2csvParser = new Json2csvParser({fields, header: true});
           const csv = json2csvParser.parse(books) + newLine;
@@ -138,7 +139,7 @@ module.exports = {
   /**
    * @requires module:csv-reorder
    * @param  {} answers
-   * @summary Reorders library.csv by column (ascending or descending)
+   * @summary Reorders library.csv by column (to be specified by user in searchBooks())
    */
   reorderCSV: (answers) => {
     reorder({
