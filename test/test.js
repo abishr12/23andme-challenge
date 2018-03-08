@@ -1,14 +1,20 @@
 const assert = require('assert');
 const controllers = require("../controllers/controllers");
-var chai = require('chai'),
+const chai = require('chai'),
   chaiHttp = require('chai-http'),
   chaiParam = require('chai-param'),
   param = chaiParam.param;
-var expect = require("chai").expect;
+const expect = require("chai").expect;
+const chaiFiles = require('chai-files');
+const fs = require('fs');
 
+const file = chaiFiles.file;
+const dir = chaiFiles.dir;
+
+chai.use(chaiFiles);
 chai.use(chaiHttp);
 
-var multiply = function (x, y) {
+const multiply = function (x, y) {
   if (typeof x !== "number" || typeof y !== "number") {
     throw new Error("x or y is not a number.");
   } else 
@@ -17,14 +23,20 @@ var multiply = function (x, y) {
 ;
 
 describe("Multiply", function () {
-  it("should multiply properly when passed numbers", function () {
+afterEach(done => {
+  console.log("Wham bam")
+});
+
+
+  it("should multiply properly when passed numbers", done => {
     expect(multiply(2, 4))
       .to
       .equal(8);
+      done();
   });
 });
 
-describe('Proper Connection To Google API', function () {
+describe('Proper Connection To Google Books API', function () {
   it('should connect to API with status 200', function (done) {
     chai
       .request('https://www.googleapis.com/books')
@@ -42,15 +54,15 @@ describe('Proper Connection To Google API', function () {
 })
 
 describe('Search Library', function () {
-  it("Throw Error If No Data Is Passed", function () {
+  it("Throw Error If No Data Is Passed", done => {
     expect(function () {
       controllers.searchLibrary()
     })
       .to
       .throw(Error);
+      done()
   });
-
-  it("Throw Error If Empty Data Is Passed", function () {
+  it("Throw Error If Empty Data Is Passed ", function () {
     expect(function () {
       controllers.searchLibrary({})
     })
@@ -58,9 +70,49 @@ describe('Search Library', function () {
       .throw(Error);
   });
 
-  it("Return No Errors From Running A Result", function () {
+  it("library.csv to not exist prior to running the function at least once ", function () {
+    expect(file('library.csv')).to.not.exist;
+  })
+
+  it("Return No Errors From Running A Proper Result ",() => {
     expect(function () {
       controllers.searchLibrary({q: 'batman', maxResults: 10})
+    })
+      .to
+      .not
+      .throw(Error);
+
+    it("library.csv to hold data", () => {
+      expect(file('library.csv')).to.not.be.empty;
+      
+    })
+
+    
+    })
+
+
+  it("Accept Incorrectly Placed Negative Values And Convert To Positive ", function () {
+    expect(function () {
+      controllers.searchLibrary({q: 'batman', maxResults: -10.5, startIndex: -20})
+    })
+      .to
+      .not
+      .throw(Error);
+  });
+
+
+  it("Return No Errors For Float Integers In Start Index ", function () {
+    expect(function () {
+      controllers.searchLibrary({q: 'batman', startIndex: 10.5})
+    })
+      .to
+      .not
+      .throw(Error);
+  });
+
+  it("Accept Null Values For Optional Parameters", function () {
+    expect(function () {
+      controllers.searchLibrary({q: 'batman', startIndex: null})
     })
       .to
       .not
