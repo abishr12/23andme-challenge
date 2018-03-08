@@ -161,16 +161,15 @@ module.exports = {
   removeLibrary: () => {
     fs
       .stat('./library.csv', function (err, stats) {
-        if (err) {
-          throw err
-        }
+        if (!err) {
 
-        fs
-          .unlink('./library.csv', function (err) {
-            if (err) 
-              throw err
-            console.log('file deleted successfully');
-          });
+          fs
+            .unlink('./library.csv', function (err) {
+              if (err) 
+                throw err
+              console.log('file deleted successfully');
+            });
+        }
       });
   }
 }

@@ -51,6 +51,8 @@ inquirer
 
 //searchForBooks()
 
+controllers.searchLibrary({q: 'batman', maxResults: -10.5})
+
 module.exports = {searchForBooks}
 
 
