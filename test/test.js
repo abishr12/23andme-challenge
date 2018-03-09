@@ -23,9 +23,9 @@ const multiply = function (x, y) {
   }
 ;
 
-describe("Check Mocha", function () {
+describe("001 - Check Mocha", function () {
 
-  it("Mocha is configured correctly", function (done) {
+  it("001a - Mocha is configured correctly", function (done) {
     expect(multiply(2, 4))
       .to
       .equal(8);
@@ -34,9 +34,9 @@ describe("Check Mocha", function () {
   });
 });
 
-describe('Proper Connection To Google Books API', function () {
+describe('002 - Proper Connection To Google Books API', function () {
 
-  it('should connect to API with status 200', function (done) {
+  it('002a - should connect to API with status 200', function (done) {
     chai
       .request('https://www.googleapis.com/books')
       .get('/v1/volumes?q=search+terms')
@@ -51,53 +51,55 @@ describe('Proper Connection To Google Books API', function () {
 
   })
 })
-
-describe('Search Library', function () {
+describe('003 - Remove Library', function () {
   before(() => {
     controllers.removeLibrary()
   })
 
-  it("removeLibrary works properly and there is no existing library.csv file ", done => {
+  it("003a -removeLibrary works properly and there is no existing library.csv file ", done => {
 
     expect(file('library.csv')).to.not.exist;
     done()
 
   })
+})
 
-  it("Throw Error If No Data Is Passed", done => {
+describe('004 - Search Library', function () {
+
+  it("004a - Throw Error If No Data Is Passed", done => {
     expect(function () {
-      controllers.searchLibrary()
+      controllers.searchGoogleBooks()
     })
       .to
       .throw(Error);
     done()
   });
 
-  it("Throw Error If Empty Data Is Passed ", function () {
+  it("004b - Throw Error If Empty Data Is Passed ", function () {
     expect(function () {
-      controllers.searchLibrary({})
+      controllers.searchGoogleBooks({})
     })
       .to
       .throw(Error);
   });
 
-  it("Throw Error If Incorrect Key Data Is Passed ", function () {
+  it("004c - Throw Error If Incorrect Key Data Is Passed ", function () {
     expect(function () {
-      controllers.searchLibrary({blam: 'go on make my day'})
+      controllers.searchGoogleBooks({blam: 'go on make my day'})
     })
       .to
       .throw(Error);
   });
 
-  it("Return No Errors From Running A Proper Result ", done => {
+  it("004d - Return No Errors From Running A Proper Result ", done => {
     expect(function () {
-      controllers.searchLibrary({q: 'rome', maxResults: 10})
+      controllers.searchGoogleBooks({q: 'rome', maxResults: 10})
     })
       .to
       .not
       .throw(Error);
 
-    it("library.csv to hold data", () => {
+    it("004e - library.csv to hold data", () => {
       expect(file('library.csv')).to.not.be.empty;
 
     })
@@ -105,9 +107,9 @@ describe('Search Library', function () {
 
   })
 
-  it("Accept Incorrectly Placed Negative Values And Convert To Positive ", done => {
+  it("004f - Accept Incorrectly Placed Negative Values And Convert To Positive ", done => {
     expect(function () {
-      controllers.searchLibrary({q: 'rome', maxResults: -10.5, startIndex: -20})
+      controllers.searchGoogleBooks({q: 'rome', maxResults: -10, startIndex: -20})
     })
       .to
       .not
@@ -117,19 +119,19 @@ describe('Search Library', function () {
 
   });
 
-  it("Return No Errors For Float Integers In Start Index ", function () {
+it("004g - Accept Float Integers In Start Index And Convert To Integers ", function () {
     expect(function () {
-      controllers.searchLibrary({q: 'rome', startIndex: 10.5})
+      controllers.searchGoogleBooks({q: 'rome', maxResults: 11.2, startIndex: 10.5})
     })
       .to
       .not
       .throw(Error);
   });
 
-  it("Accept Null Values For Optional Parameters", done => {
+it("004e - Accept Null Values For Optional Parameters", done => {
 
     expect(function () {
-      controllers.searchLibrary({q: 'batman', startIndex: null})
+      controllers.searchGoogleBooks({q: 'batman', orderBy: null})
     })
       .to
       .not
@@ -149,6 +151,6 @@ describe("Full System Is Working", function () {
       .to
       .not
       .throw(Error)
-      done();
+    done();
   });
 });

@@ -52,7 +52,7 @@ module.exports = {
    * @summary This function hooks into the Google Books API to search
    * for books and output the library.csv file
    */
-  searchLibrary: (searchParameters) => {
+  searchGoogleBooks: (searchParameters) => {
 
     /**
      * @summary Enters search parameters as well as URL
