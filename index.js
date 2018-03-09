@@ -25,7 +25,7 @@ inquirer
     answers.maxResults = parseInt(answers.maxResults)
     answers.startIndex = parseInt(answers.startIndex)
 
-    controllers.searchLibrary(answers)
+    controllers.searchGoogleBooks(answers)
   })
   .then(() => {
     /**
@@ -50,6 +50,7 @@ inquirer
 }
 
 searchForBooks()
+
 
 
 

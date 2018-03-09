@@ -7,6 +7,7 @@ const chai = require('chai'),
 const expect = require("chai").expect;
 const chaiFiles = require('chai-files');
 const fs = require('fs');
+const index = require('../index')
 
 const file = chaiFiles.file;
 const dir = chaiFiles.dir;
@@ -22,22 +23,20 @@ const multiply = function (x, y) {
   }
 ;
 
-describe("Multiply", function () {
-afterEach(done => {
-  console.log("Wham bam")
-});
+describe("001 - Check Mocha", function () {
 
-
-  it("should multiply properly when passed numbers", done => {
+  it("001a - Mocha is configured correctly", function (done) {
     expect(multiply(2, 4))
       .to
       .equal(8);
-      done();
+
+    done();
   });
 });
 
-describe('Proper Connection To Google Books API', function () {
-  it('should connect to API with status 200', function (done) {
+describe('002 - Proper Connection To Google Books API', function () {
+
+  it('002a - should connect to API with status 200', function (done) {
     chai
       .request('https://www.googleapis.com/books')
       .get('/v1/volumes?q=search+terms')
@@ -52,71 +51,106 @@ describe('Proper Connection To Google Books API', function () {
 
   })
 })
-
-describe('Search Library', function () {
-  it("Throw Error If No Data Is Passed", done => {
-    expect(function () {
-      controllers.searchLibrary()
-    })
-      .to
-      .throw(Error);
-      done()
-  });
-  it("Throw Error If Empty Data Is Passed ", function () {
-    expect(function () {
-      controllers.searchLibrary({})
-    })
-      .to
-      .throw(Error);
-  });
-
-  it("library.csv to not exist prior to running the function at least once ", function () {
-    expect(file('library.csv')).to.not.exist;
+describe('003 - Remove Library', function () {
+  before(() => {
+    controllers.removeLibrary()
   })
 
-  it("Return No Errors From Running A Proper Result ",() => {
+  it("003a -removeLibrary works properly and there is no existing library.csv file ", done => {
+
+    expect(file('library.csv')).to.not.exist;
+    done()
+
+  })
+})
+
+describe('004 - Search Library', function () {
+
+  it("004a - Throw Error If No Data Is Passed", done => {
     expect(function () {
-      controllers.searchLibrary({q: 'batman', maxResults: 10})
+      controllers.searchGoogleBooks()
+    })
+      .to
+      .throw(Error);
+    done()
+  });
+
+  it("004b - Throw Error If Empty Data Is Passed ", function () {
+    expect(function () {
+      controllers.searchGoogleBooks({})
+    })
+      .to
+      .throw(Error);
+  });
+
+  it("004c - Throw Error If Incorrect Key Data Is Passed ", function () {
+    expect(function () {
+      controllers.searchGoogleBooks({blam: 'go on make my day'})
+    })
+      .to
+      .throw(Error);
+  });
+
+  it("004d - Return No Errors From Running A Proper Result ", done => {
+    expect(function () {
+      controllers.searchGoogleBooks({q: 'rome', maxResults: 10})
     })
       .to
       .not
       .throw(Error);
 
-    it("library.csv to hold data", () => {
+    it("004e - library.csv to hold data", () => {
       expect(file('library.csv')).to.not.be.empty;
-      
+
     })
+    done();
 
-    
-    })
+  })
 
-
-  it("Accept Incorrectly Placed Negative Values And Convert To Positive ", function () {
+  it("004f - Accept Incorrectly Placed Negative Values And Convert To Positive ", done => {
     expect(function () {
-      controllers.searchLibrary({q: 'batman', maxResults: -10.5, startIndex: -20})
+      controllers.searchGoogleBooks({q: 'rome', maxResults: -10, startIndex: -20})
+    })
+      .to
+      .not
+      .throw(Error);
+
+    done()
+
+  });
+
+it("004g - Accept Float Integers In Start Index And Convert To Integers ", function () {
+    expect(function () {
+      controllers.searchGoogleBooks({q: 'rome', maxResults: 11.2, startIndex: 10.5})
     })
       .to
       .not
       .throw(Error);
   });
 
+it("004e - Accept Null Values For Optional Parameters", done => {
 
-  it("Return No Errors For Float Integers In Start Index ", function () {
     expect(function () {
-      controllers.searchLibrary({q: 'batman', startIndex: 10.5})
+      controllers.searchGoogleBooks({q: 'batman', orderBy: null})
     })
       .to
       .not
       .throw(Error);
-  });
 
-  it("Accept Null Values For Optional Parameters", function () {
-    expect(function () {
-      controllers.searchLibrary({q: 'batman', startIndex: null})
-    })
-      .to
-      .not
-      .throw(Error);
+    done()
+
   });
 
 })
+
+describe("Full System Is Working", function () {
+  it("Search For Books Functions Without Errors", function (done) {
+    expect(function () {
+      index.searchForBooks()
+    })
+      .to
+      .not
+      .throw(Error)
+    done();
+  });
+});

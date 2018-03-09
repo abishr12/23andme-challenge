@@ -52,7 +52,7 @@ module.exports = {
    * @summary This function hooks into the Google Books API to search
    * for books and output the library.csv file
    */
-  searchLibrary: (searchParameters) => {
+  searchGoogleBooks: (searchParameters) => {
 
     /**
      * @summary Enters search parameters as well as URL
@@ -159,6 +159,7 @@ module.exports = {
  * @summary Removes library.csv to create new one
  */
   removeLibrary: () => {
+    console.log('removing library.csv')
     fs
       .stat('./library.csv', function (err, stats) {
         if (!err) {
