@@ -159,6 +159,7 @@ module.exports = {
  * @summary Removes library.csv to create new one
  */
   removeLibrary: () => {
+    console.log('removing library.csv')
     fs
       .stat('./library.csv', function (err, stats) {
         if (!err) {
