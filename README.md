@@ -16,7 +16,7 @@ A User-Friendly CLI that can be used to access the Google Books API and store yo
 
 This was incredibly fun and I would like to thank you for giving me the opportunity to apply at 23&Me.
 
-![Thank You !!!](https://media.giphy.com/media/KJ1f5iTl4Oo7u/giphy.gif)
+![Thank You !!!](https://media.giphy.com/media/QhGna81oRMSpa/giphy.gif)
 
 ## Running The Google Books App
 
@@ -97,7 +97,7 @@ Best,
 Adham
 
 
-![cool](https://media.giphy.com/media/Q6gPyUYrCk76g/giphy.gif)
+![cool](https://media.giphy.com/media/xIJLgO6rizUJi/giphy.gif)
 
 
 
